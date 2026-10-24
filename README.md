@@ -37,13 +37,28 @@ An onboarding has a surrogate `OnboardingId` (UUID), a human business key (`OB-7
         \            \                   /           injects Rule
          \            \                 /
                      domain                          persistence
-        OnboardingId  OnboardingStatus  OnboardingPolicy   OnboardingJdbc (JDBC)
-        Rule: TransitionRule, NotStartedCannotFinish, ChainRule
-        CompletionNotifier (port)  DuplicateOnboarding
-                     (no Spring, no java.sql)
+        OnboardingId  OnboardingStatus  OnboardingPolicy   OnboardingEntity (@Entity)
+        Rule: TransitionRule, NotStartedCannotFinish, ChainRule   OnboardingJpa (EntityManager)
+        CompletionNotifier (port)  DuplicateOnboarding           OnboardingMapper
+                     (no Spring, no java.sql, no jakarta.persistence)
 ```
 
-Arrows point inward. `domain` imports neither `org.springframework` nor `java.sql`.
+Arrows point inward. `domain` imports neither `org.springframework`, `java.sql` nor `jakarta.persistence`.
+
+## Schema
+
+Flyway owns the schema: `src/main/resources/db/migration/V1__create_onboarding.sql` runs on startup, then Hibernate checks the entity against it (`ddl-auto: validate`). Hibernate never creates or alters tables.
+
+- `onboarding.status` CHECK lists `PLANNED`, `STARTED`, `DONE` — the same tokens as `OnboardingStatus` and the status table above.
+- A schema change is a new file (`V2__...sql`). A migration that already ran is never edited.
+- Tests `DELETE FROM onboarding`; they never drop the table.
+
+Reset a local database that was created by hand (connect to `postgres`, not `css`):
+
+```
+DROP DATABASE IF EXISTS css WITH (FORCE);
+CREATE DATABASE css OWNER css;
+```
 
 ## Run
 

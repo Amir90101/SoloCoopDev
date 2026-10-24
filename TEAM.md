@@ -12,11 +12,13 @@ Owns `domain/`, `src/test/.../domain/`, README sections Product / Core item / St
 
 ## Role B — Spring, SQL, JDBC
 
-Owns `config/`, `client/`, `persistence/`, `db/schema.sql`, `pom.xml`, `docker-compose.yml`, `OnboardingPersistenceTest`.
+Owns `config/`, `client/`, `persistence/`, `db/migration/`, `pom.xml`, `docker-compose.yml`, `OnboardingPersistenceTest`.
 
 - Lab 2: parent POM, `Application`, `RuleConfig` (`@Bean Rule`), `OnboardingService`, package diagram, PR.
 - Lab 3 week 5: table by hand, rollback proved in psql, `DuplicateOnboarding` handling, two count tests.
 - Lab 3 week 6: `schema.sql` file, `OnboardingJdbc` with `?` placeholders.
+- Lab 3 week 6 (JPA): `OnboardingEntity`, `OnboardingJpa` (`persist`, `flush`, `count`), `OnboardingMapper`, `ddl-auto: validate`.
+- Lab 3 week 7 (Flyway): `schema.sql` becomes `V1__create_onboarding.sql`, tests `DELETE FROM` instead of `DROP`.
 
 ## Contract between the roles
 
@@ -32,5 +34,6 @@ Owns `config/`, `client/`, `persistence/`, `db/schema.sql`, `pom.xml`, `docker-c
 | 1 | A | `lab1-domain` | `CSS-XX statuses and policy` |
 | 2 | B | `lab2-spring` | `CSS-XX join Spring Boot` |
 | 3 | B | `lab3-sql-jdbc` | `CSS-XX schema and JDBC` |
+| 3 | B | `lab3-jpa-flyway` | `CSS-XX JPA and Flyway` |
 
 Each PR is reviewed by the other person. Role A also owns the week 4 tests inside the Lab 3 PR (separate commits).

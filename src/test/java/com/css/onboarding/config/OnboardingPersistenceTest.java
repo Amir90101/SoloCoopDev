@@ -6,10 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.css.onboarding.domain.DuplicateOnboarding;
 import com.css.onboarding.domain.OnboardingId;
 import com.css.onboarding.domain.OnboardingStatus;
-import com.css.onboarding.persistence.OnboardingJdbc;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.css.onboarding.persistence.OnboardingJpa;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +14,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+// Flyway runs V1 when the context starts, then Hibernate validates.
 // No @Transactional here: the count must come from committed data.
 @SpringBootTest(classes = Application.class)
 class OnboardingPersistenceTest {
 
   @Autowired JdbcTemplate jdbc;
   @Autowired OnboardingService service;
-  @Autowired OnboardingJdbc onboardings;
+  @Autowired OnboardingJpa onboardings;
 
   @BeforeEach
-  void cleanDatabase() throws IOException {
-    jdbc.execute("DROP TABLE IF EXISTS onboarding");
-    jdbc.execute(Files.readString(Path.of("src/main/resources/db/schema.sql")));
+  void empty() {
+    // Flyway owns the schema. Delete rows, never DROP the table.
+    jdbc.update("DELETE FROM onboarding");
   }
 
   @Test

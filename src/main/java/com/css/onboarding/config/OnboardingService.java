@@ -1,11 +1,14 @@
 package com.css.onboarding.config;
 
+import static com.css.onboarding.persistence.OnboardingMapper.toEntity;
+
 import com.css.onboarding.domain.CompletionNotifier;
 import com.css.onboarding.domain.DuplicateOnboarding;
 import com.css.onboarding.domain.OnboardingId;
 import com.css.onboarding.domain.OnboardingStatus;
 import com.css.onboarding.domain.Rule;
-import com.css.onboarding.persistence.OnboardingJdbc;
+import com.css.onboarding.persistence.OnboardingEntity;
+import com.css.onboarding.persistence.OnboardingJpa;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class OnboardingService {
 
   private final Rule rules;
-  private final OnboardingJdbc onboardings;
+  private final OnboardingJpa onboardings;
   private final CompletionNotifier notifier;
 
-  public OnboardingService(Rule rules, OnboardingJdbc onboardings, CompletionNotifier notifier) {
+  public OnboardingService(Rule rules, OnboardingJpa onboardings, CompletionNotifier notifier) {
     this.rules = rules;
     this.onboardings = onboardings;
     this.notifier = notifier;
@@ -36,7 +39,8 @@ public class OnboardingService {
   public void register(OnboardingId id, String businessKey, String title) {
     requireKey(businessKey);
     try {
-      onboardings.insert(id.value(), businessKey, new OnboardingStatus.Planned(), title);
+      onboardings.insert(toEntity(id.value(), businessKey, new OnboardingStatus.Planned(), title));
+      onboardings.flush();
     } catch (DataIntegrityViolationException ex) {
       throw new DuplicateOnboarding(businessKey);
     }
@@ -46,12 +50,17 @@ public class OnboardingService {
   @Transactional
   public void insertTwice(String businessKey) {
     requireKey(businessKey);
-    onboardings.insert(OnboardingId.newId().value(), businessKey, new OnboardingStatus.Planned(), "first");
+    onboardings.insert(newRow(businessKey, "first"));
     try {
-      onboardings.insert(OnboardingId.newId().value(), businessKey, new OnboardingStatus.Planned(), "second");
+      onboardings.insert(newRow(businessKey, "second")); // a second UUID, the same key
+      onboardings.flush();
     } catch (DataIntegrityViolationException ex) {
       throw new DuplicateOnboarding(businessKey);
     }
+  }
+
+  private static OnboardingEntity newRow(String businessKey, String title) {
+    return toEntity(OnboardingId.newId().value(), businessKey, new OnboardingStatus.Planned(), title);
   }
 
   private static void requireKey(String businessKey) {
