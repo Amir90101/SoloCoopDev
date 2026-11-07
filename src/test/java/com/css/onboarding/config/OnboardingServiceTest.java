@@ -10,7 +10,7 @@ import com.css.onboarding.domain.OnboardingPolicy;
 import com.css.onboarding.domain.OnboardingStatus.Done;
 import com.css.onboarding.domain.OnboardingStatus.Planned;
 import com.css.onboarding.domain.OnboardingStatus.Started;
-import com.css.onboarding.persistence.OnboardingJdbc;
+import com.css.onboarding.persistence.OnboardingJpa;
 import org.junit.jupiter.api.Test;
 
 /** Outbound port is mocked. No HTTP, no database. */
@@ -18,7 +18,7 @@ class OnboardingServiceTest {
 
   private final CompletionNotifier notifier = mock(CompletionNotifier.class);
   private final OnboardingService service =
-      new OnboardingService(OnboardingPolicy.defaultRule(), mock(OnboardingJdbc.class), notifier);
+      new OnboardingService(OnboardingPolicy.defaultRule(), mock(OnboardingJpa.class), notifier);
 
   @Test
   void finishingNotifiesOnce() {
