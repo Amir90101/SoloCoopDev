@@ -1,5 +1,7 @@
 package com.css.onboarding.persistence;
 
+import com.css.onboarding.domain.Onboarding;
+import com.css.onboarding.domain.OnboardingId;
 import com.css.onboarding.domain.OnboardingStatus;
 import java.util.UUID;
 
@@ -11,6 +13,11 @@ public final class OnboardingMapper {
 
   public static OnboardingEntity toEntity(UUID id, String businessKey, OnboardingStatus status, String title) {
     return new OnboardingEntity(id, businessKey, toColumn(status), title);
+  }
+
+  public static Onboarding toDomain(OnboardingEntity row) {
+    return new Onboarding(
+        new OnboardingId(row.getId()), row.getBusinessKey(), toStatus(row.getStatus()), row.getTitle());
   }
 
   public static String toColumn(OnboardingStatus status) {

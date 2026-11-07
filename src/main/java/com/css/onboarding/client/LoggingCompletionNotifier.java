@@ -9,8 +9,15 @@ public class LoggingCompletionNotifier implements CompletionNotifier {
 
   private static final System.Logger LOG = System.getLogger("notifier");
 
+  private final DownstreamProperties downstream;
+
+  public LoggingCompletionNotifier(DownstreamProperties downstream) {
+    this.downstream = downstream;
+  }
+
   @Override
   public void completed(String businessKey) {
-    LOG.log(System.Logger.Level.INFO, "onboarding completed: {0}", businessKey);
+    LOG.log(System.Logger.Level.INFO, "onboarding completed: {0} (would notify {1}, timeout {2})",
+        businessKey, downstream.baseUrl(), downstream.timeout());
   }
 }

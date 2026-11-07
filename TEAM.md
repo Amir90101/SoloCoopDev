@@ -20,6 +20,11 @@ Owns `config/`, `client/`, `persistence/`, `db/migration/`, `pom.xml`, `docker-c
 - Lab 3 week 6 (JPA): `OnboardingEntity`, `OnboardingJpa` (`persist`, `flush`, `count`), `OnboardingMapper`, `ddl-auto: validate`.
 - Lab 3 week 7 (Flyway): `schema.sql` becomes `V1__create_onboarding.sql`, tests `DELETE FROM` instead of `DROP`.
 
+## Lab 4
+
+- Role B — `handler/` (controller, records, `ApiExceptionHandler`), `application*.yaml`, `DownstreamProperties`, actuator, `OnboardingApiTest`, `ActuatorTest`, `DevProfileTest`.
+- Role A — `Onboarding`, `OnboardingNotFound` in `domain`, `OnboardingControllerTest` (201/400/404/409/correlation id), `DomainPurityTest` (no `jakarta.validation`, no `ResponseEntity`).
+
 ## Contract between the roles
 
 - `Rule.check(OnboardingStatus from, OnboardingStatus to)` throws `IllegalStateException`.
@@ -35,5 +40,6 @@ Owns `config/`, `client/`, `persistence/`, `db/migration/`, `pom.xml`, `docker-c
 | 2 | B | `lab2-spring` | `CSS-XX join Spring Boot` |
 | 3 | B | `lab3-sql-jdbc` | `CSS-XX schema and JDBC` |
 | 3 | B | `lab3-jpa-flyway` | `CSS-XX JPA and Flyway` |
+| 4 | A + B | `lab4-rest-config` | `CSS-XX REST contract and config` |
 
 Each PR is reviewed by the other person. Role A also owns the week 4 tests inside the Lab 3 PR (separate commits).
