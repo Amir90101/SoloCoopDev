@@ -3,6 +3,8 @@ package com.css.onboarding.persistence;
 import com.css.onboarding.domain.OnboardingStatus;
 import jakarta.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 /** persist always inserts. Spring Data save() with our UUID would SELECT first. */
@@ -22,6 +24,10 @@ public class OnboardingJpa {
   /** persist only remembers the row; flush sends the INSERT so the UNIQUE violation surfaces here. */
   public void flush() {
     em.flush();
+  }
+
+  public Optional<OnboardingEntity> findById(UUID id) {
+    return Optional.ofNullable(em.find(OnboardingEntity.class, id));
   }
 
   public int count(String businessKey) {

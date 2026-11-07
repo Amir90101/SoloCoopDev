@@ -1,14 +1,18 @@
 package com.css.onboarding.config;
 
+import static com.css.onboarding.persistence.OnboardingMapper.toDomain;
 import static com.css.onboarding.persistence.OnboardingMapper.toEntity;
 
 import com.css.onboarding.domain.CompletionNotifier;
 import com.css.onboarding.domain.DuplicateOnboarding;
+import com.css.onboarding.domain.Onboarding;
 import com.css.onboarding.domain.OnboardingId;
+import com.css.onboarding.domain.OnboardingNotFound;
 import com.css.onboarding.domain.OnboardingStatus;
 import com.css.onboarding.domain.Rule;
 import com.css.onboarding.persistence.OnboardingEntity;
 import com.css.onboarding.persistence.OnboardingJpa;
+import com.css.onboarding.persistence.OnboardingMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,16 +38,26 @@ public class OnboardingService {
     return to;
   }
 
-  /** One transaction per call. */
+  /** One transaction per call. Returns the domain view, never the entity. */
   @Transactional
-  public void register(OnboardingId id, String businessKey, String title) {
+  public Onboarding register(OnboardingId id, String businessKey, String title) {
     requireKey(businessKey);
+    OnboardingEntity row = toEntity(id.value(), businessKey, new OnboardingStatus.Planned(), title);
     try {
-      onboardings.insert(toEntity(id.value(), businessKey, new OnboardingStatus.Planned(), title));
+      onboardings.insert(row);
       onboardings.flush();
     } catch (DataIntegrityViolationException ex) {
       throw new DuplicateOnboarding(businessKey);
     }
+    return toDomain(row);
+  }
+
+  /** Reads only: no register, no move, no flush. */
+  @Transactional(readOnly = true)
+  public Onboarding get(OnboardingId id) {
+    return onboardings.findById(id.value())
+        .map(OnboardingMapper::toDomain)
+        .orElseThrow(() -> new OnboardingNotFound(id));
   }
 
   /** One transaction, two inserts. The second one fails and takes the first with it. */

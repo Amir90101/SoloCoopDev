@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class DomainPurityTest {
 
   @Test
-  void domainImportsNoSpringNoJdbcNoJpa() throws IOException {
+  void domainImportsNoSpringNoJdbcNoJpaNoValidation() throws IOException {
     Path dir = Path.of("src/main/java/com/css/onboarding/domain");
     try (var files = Files.list(dir)) {
       List<Path> sources = files.filter(p -> p.toString().endsWith(".java")).toList();
@@ -20,6 +20,8 @@ class DomainPurityTest {
         assertFalse(text.contains("org.springframework"), p + " imports Spring");
         assertFalse(text.contains("java.sql"), p + " imports java.sql");
         assertFalse(text.contains("jakarta.persistence"), p + " imports jakarta.persistence");
+        assertFalse(text.contains("jakarta.validation"), p + " imports jakarta.validation");
+        assertFalse(text.contains("ResponseEntity"), p + " uses ResponseEntity");
       }
     }
   }

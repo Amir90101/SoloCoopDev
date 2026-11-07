@@ -1,0 +1,41 @@
+# Shared by every profile. No password here: see application-dev.yaml / application-prod.yaml.
+spring:
+  application:
+    name: onboarding
+  profiles:
+    default: dev
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    out-of-order: false
+
+# Boot's own error page must not leak internals.
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+    include-binding-errors: never
+    include-exception: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Onboarding
+    description: Statuses of a new hire's onboarding (PLANNED, STARTED, DONE)
